@@ -38,7 +38,7 @@ curl -X POST http://localhost:5039/Users \
 Expected Response:
 •	Status: 201 Created
 •	Body: JSON with the created user (including id).
----
+
 
 2. Getting the List of Users (GET /users)
 
@@ -48,7 +48,7 @@ curl -X GET http://localhost:5039/Users
 Expected Response:
 •	Status: 200 OK
 •	Body: JSON array of users.
----
+
 
 3. Creating a User with Invalid Email (POST /users)
 ```
@@ -63,7 +63,7 @@ curl -X POST http://localhost:5039/Users \
 Expected Response:
 •	Status: 400 Bad Request
 •	Body: "Valid Email is required."
----
+
 
 4. Creating a User with Future Date of Birth (POST /users)
 ```
@@ -78,5 +78,5 @@ curl -X POST https://localhost:5001/Users \
 Expected Response:
 •	Status: 400 Bad Request
 •	Body: "DateOfBirth cannot be in the future."
----
+
 
