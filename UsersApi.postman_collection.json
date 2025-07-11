@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "Users API Tests",
+    "_postman_id": "b1e2c3d4-5678-1234-9abc-def012345678",
+    "description": "Test scenarios for Users API (.NET 8)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Valid User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Alice Smith\",\n  \"email\": \"alice@example.com\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5039/Users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5039",
+          "path": ["Users"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"Response has id\", function () {",
+              "    var json = pm.response.json();",
+              "    pm.expect(json).to.have.property('id');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5039/Users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5039",
+          "path": ["Users"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response is array\", function () {",
+              "    pm.expect(pm.response.json()).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User with Invalid Email",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Bob Brown\",\n  \"email\": \"not-an-email\",\n  \"dateOfBirth\": \"1985-03-10T00:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5039/Users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5039",
+          "path": ["Users"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"Error message for invalid email\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"Valid Email is required\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User with Future Date of Birth",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Charlie Green\",\n  \"email\": \"charlie@example.com\",\n  \"dateOfBirth\": \"2999-01-01T00:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "https://localhost:5039/Users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5039",
+          "path": ["Users"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"Error message for future date\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"DateOfBirth cannot be in the future\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
