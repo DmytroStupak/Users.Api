@@ -80,3 +80,12 @@ Expected Response:
 •	Body: "DateOfBirth cannot be in the future."
 
 
+Java Tests :
+```
+•	Place UsersApiTest.java file in src/test/java/ in your Java project.
+•	Add dependencies for rest-assured and junit-jupiter (JUnit 5) in your pom.xml or build.gradle.
+•	Run with mvn test or your preferred method.
+
+```
+
+

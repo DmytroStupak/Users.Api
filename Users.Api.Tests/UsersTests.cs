@@ -1,45 +1,102 @@
+using FluentValidation.TestHelper;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
 using Users.Api.Controllers;
 using Users.Api.Models;
+using Users.Api.Validators;
 using Xunit;
 
-namespace User.Api.Tests
+namespace User.Api.Tests;
+
+public class UsersTests
 {
-    public class UsersTests
+    [Fact]
+    public void FutureDateOfBirth_ShouldHaveValidationError()
     {
-        [Fact]
-        public void CreateUser_InvalidEmail_ReturnsBadRequest()
+        var validator = new UserModelValidator();
+        var model = new UserModel
         {
-            // Arrange
-            var controller = new UsersController();
-            var user = new UserModel
-            {
-                FullName = "Jane Doe",
-                Email = "invalid-email",
-                DateOfBirth = new DateTime(1990, 1, 1)
-            };
+            FullName = "Future Person",
+            Email = "future@example.com",
+            DateOfBirth = DateTime.UtcNow.AddDays(1)
+        };
 
-            // Act
-            var result = controller.CreateUser(user);
+        var result = validator.TestValidate(model);
+        result.ShouldHaveValidationErrorFor(u => u.DateOfBirth)
+              .WithErrorMessage("DateOfBirth cannot be in the future.");
+    }
 
-            // Assert
-            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Contains("Valid Email is required", badRequest.Value.ToString());
-        }
+    [Fact]
+    public void DeleteUser_NonExistingId_ReturnsNotFound()
+    {
+        // Arrange
+        var controller = new UsersController();
 
-        [Fact]
-        public void DeleteUser_NonExistingId_ReturnsNotFound()
+        // Act
+        var result = controller.DeleteUser(999);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
+    [Fact]
+    public void MissingEmail_ShouldHaveValidationError()
+    {
+        // Arrange
+        var validator = new UserModelValidator();
+        var user = new UserModel
         {
-            // Arrange
-            var controller = new UsersController();
+            FullName = "Jane Doe",
+            Email = "",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
 
-            // Act
-            var result = controller.DeleteUser(999);
+        // Act
+        var result = validator.TestValidate(user);
 
-            // Assert
-            Assert.IsType<NotFoundResult>(result);
-        }
+        // Assert
+        result.ShouldHaveValidationErrorFor(u => u.Email)
+              .WithErrorMessage("Email is required.");
+    }
+
+    [Fact]
+    public void FullNameTooShort_ShouldHaveValidationError()
+    {
+        // Arrange
+        var validator = new UserModelValidator();
+        var user = new UserModel
+        {
+            FullName = "A",
+            Email = "a@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+
+        // Act
+        var result = validator.TestValidate(user);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(u => u.FullName)
+              .WithErrorMessage("FullName must be at least 2 characters long.");
+    }
+
+    [Fact]
+    public void MissingFullName_ShouldHaveValidationError()
+    {
+        // Arrange
+        var validator = new UserModelValidator();
+        var user = new UserModel
+        {
+            FullName = "",
+            Email = "a@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+
+        // Act
+        var result = validator.TestValidate(user);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(u => u.FullName)
+              .WithErrorMessage("FullName is required.");
     }
 }
